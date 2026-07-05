@@ -207,47 +207,24 @@ border:.5px solid #232B45;
 
 # ===================== SIDEBAR =====================
 
-st.sidebar.image(
-"https://img.icons8.com/color/96/artificial-intelligence.png",
-width=70
-)
 
-st.sidebar.title("Customer Churn")
 
-page = st.sidebar.radio(
+if "page" not in st.session_state:
+    st.session_state.page = "🏠 Dashboard"
 
-"Navigation",
-
-[
-
-"🏠 Dashboard",
-
-"🔮 Prediction",
-
-"📈 Analytics",
-
-"📋 Customers",
-
-"⚙ Settings"
-
+pages = [
+    "🏠 Dashboard",
+    "🔮 Prediction",
+    "📈 Analytics"
 ]
 
+page = st.sidebar.radio(
+    "Navigation",
+    pages,
+    index=pages.index(st.session_state.page)
 )
 
-st.sidebar.markdown("---")
-
-st.sidebar.success("Model Loaded Successfully")
-
-st.sidebar.info(f"""
-
-Total Customers : {total_customers}
-
-Active Customers : {active_customers}
-
-Churn Customers : {churn_customers}
-
-""")
-
+st.session_state.page = page
 # ===================== HEADER =====================
 
 st.markdown(
