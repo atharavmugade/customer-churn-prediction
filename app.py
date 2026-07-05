@@ -463,116 +463,201 @@ with right:
 st.write("")
 
 # part 4
-# ========================= PREDICTION RESULT =========================
+# ===================== PREDICTION PANEL =====================
 
 st.markdown("---")
 
-left,right=st.columns([1,1])
+st.subheader("🔮 Customer Churn Prediction")
+
+left,right=st.columns([1,2])
 
 with left:
 
-    st.markdown("### 🎯 Prediction Result")
+    gender=st.selectbox(
+        "Gender",
+        ["Male","Female"]
+    )
+
+    senior=st.selectbox(
+        "Senior Citizen",
+        ["No","Yes"]
+    )
+
+    partner=st.selectbox(
+        "Partner",
+        ["No","Yes"]
+    )
+
+    dependents=st.selectbox(
+        "Dependents",
+        ["No","Yes"]
+    )
+
+    tenure=st.number_input(
+        "Tenure (Months)",
+        0,
+        72,
+        12
+    )
+
+    phone=st.selectbox(
+        "Phone Service",
+        ["Yes","No"]
+    )
+
+    internet=st.selectbox(
+        "Internet Service",
+        [
+            "DSL",
+            "Fiber optic",
+            "No"
+        ]
+    )
+
+    contract=st.selectbox(
+        "Contract Type",
+        [
+            "Month-to-month",
+            "One year",
+            "Two year"
+        ]
+    )
+
+    payment=st.selectbox(
+        "Payment Method",
+        [
+            "Electronic check",
+            "Mailed check",
+            "Bank transfer (automatic)",
+            "Credit card (automatic)"
+        ]
+    )
+
+    monthly=st.number_input(
+        "Monthly Charges",
+        18.0,
+        120.0,
+        70.0
+    )
+
+    total=st.number_input(
+        "Total Charges",
+        18.0,
+        9000.0,
+        850.0
+    )
+
+    predict=st.button("🚀 Predict Churn")
+
+with right:
+
+    st.markdown("## Prediction Result")
 
     if predict:
 
-        # ---------- Encode Input ----------
+        st.success("Prediction Completed Successfully")
 
-        input_df=pd.DataFrame({
+        input_data=pd.DataFrame({
 
-            "gender":[gender],
-            "SeniorCitizen":[0],
-            "Partner":["Yes"],
-            "Dependents":["No"],
-            "tenure":[tenure],
-            "PhoneService":["Yes"],
-            "MultipleLines":["No"],
-            "InternetService":[internet],
-            "OnlineSecurity":["No"],
-            "OnlineBackup":["No"],
-            "DeviceProtection":["No"],
-            "TechSupport":["No"],
-            "StreamingTV":["No"],
-            "StreamingMovies":["No"],
-            "Contract":[contract],
-            "PaperlessBilling":["Yes"],
-            "PaymentMethod":["Electronic check"],
-            "MonthlyCharges":[monthly],
-            "TotalCharges":[total]
+        "gender":[gender],
+
+        "SeniorCitizen":[1 if senior=="Yes" else 0],
+
+        "Partner":[partner],
+
+        "Dependents":[dependents],
+
+        "tenure":[tenure],
+
+        "PhoneService":[phone],
+
+        "MultipleLines":["No"],
+
+        "InternetService":[internet],
+
+        "OnlineSecurity":["No"],
+
+        "OnlineBackup":["No"],
+
+        "DeviceProtection":["No"],
+
+        "TechSupport":["No"],
+
+        "StreamingTV":["No"],
+
+        "StreamingMovies":["No"],
+
+        "Contract":[contract],
+
+        "PaperlessBilling":["Yes"],
+
+        "PaymentMethod":[payment],
+
+        "MonthlyCharges":[monthly],
+
+        "TotalCharges":[total]
 
         })
 
-        # ---------- Label Encoding ----------
-
         for col in columns:
-            input_df[col] = label_encoders[col].transform(input_df[col])
 
-        # ---------- Prediction ----------
+            input_data[col]=label_encoders[col].transform(input_data[col])
 
-        pred = model.predict(input_df)[0]
-        prob = model.predict_proba(input_df)[0]
+        prediction=model.predict(input_data)[0]
 
-        if pred == 1:
+        probability=model.predict_proba(input_data)[0]
 
-            st.error("❌ Customer Will Churn")
+        if prediction==1:
+
+            st.error("❌ Customer is Likely to Churn")
 
             st.metric(
+
                 "Churn Probability",
-                f"{prob[1]*100:.2f}%"
+
+                f"{probability[1]*100:.2f}%"
+
             )
+
+            st.warning("""
+
+High Risk Customer
+
+Recommendation
+
+✔ Offer Discount
+
+✔ Contact Customer
+
+✔ Upgrade Plan
+
+""")
 
         else:
 
             st.success("✅ Customer Will Stay")
 
             st.metric(
+
                 "Retention Probability",
-                f"{prob[0]*100:.2f}%"
+
+                f"{probability[0]*100:.2f}%"
+
             )
 
-with right:
+            st.info("""
 
-    st.markdown("### 💡 Recommendation")
+Low Risk Customer
 
-    if predict:
+Recommendation
 
-        if pred == 1:
-
-            st.warning("""
-
-🔴 High Risk Customer
-
-✔ Offer Discount
-
-✔ Contact Customer
-
-✔ Suggest Yearly Plan
-
-✔ Priority Support
-
-""")
-
-        else:
-
-            st.success("""
-
-🟢 Low Risk Customer
+✔ Keep Existing Plan
 
 ✔ Loyalty Rewards
 
-✔ Continue Current Plan
-
-✔ Regular Follow-up
+✔ Continue Service
 
 """)
-
-# ========================= FOOTER =========================
-
-st.markdown("---")
-
-st.caption(
-    "Customer Churn Prediction Dashboard • Machine Learning • Streamlit"
-)
-
 # part 5
 # ========================= RISK FACTORS =========================
 
