@@ -25,7 +25,7 @@ df = pd.read_csv("final_data.csv")
 
 # ===================== LOAD MODEL =====================
 
-with open("customer_churn_model.pkl", "rb") as file:
+with open("model.pkl", "rb") as file:
     model = pickle.load(file)
 
 # ===================== REMOVE CUSTOMER ID =====================
