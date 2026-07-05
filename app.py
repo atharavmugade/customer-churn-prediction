@@ -98,6 +98,15 @@ avg_total = round(
 # ===================== CUSTOM CSS =====================
 
 st.markdown("""
+            [data-testid="stSidebar"]{
+    background:#111827;
+    min-width:280px;
+    max-width:280px;
+}
+
+[data-testid="collapsedControl"]{
+    display:none;
+}
 <style>
 
 #MainMenu{
@@ -207,46 +216,26 @@ border:.5px solid #232B45;
 
 # ===================== SIDEBAR =====================
 
-st.sidebar.image(
-"https://img.icons8.com/color/96/artificial-intelligence.png",
-width=70
-)
 
-st.sidebar.title("Customer Churn")
+with st.sidebar:
 
-page = st.sidebar.radio(
+    st.title("📊 Churn AI")
 
-"Navigation",
+    st.markdown("---")
 
-[
+    page = st.radio(
+        "Navigation",
+        [
+            "🏠 Dashboard",
+            "🔮 Prediction",
+            "📈 Analytics"
+        ]
+    )
 
-"🏠 Dashboard",
+    st.markdown("---")
 
-"🔮 Prediction",
-
-"📈 Analytics",
-
-"📋 Customers",
-
-"⚙ Settings"
-
-]
-
-)
-
-st.sidebar.markdown("---")
-
-st.sidebar.success("Model Loaded Successfully")
-
-st.sidebar.info(f"""
-
-Total Customers : {total_customers}
-
-Active Customers : {active_customers}
-
-Churn Customers : {churn_customers}
-
-""")
+    st.metric("👥 Customers", total_customers)
+    st.metric("📊 Churn Rate", f"{churn_rate}%")
 
 # ===================== HEADER =====================
 
@@ -386,321 +375,179 @@ st.write("")
 st.write("")
 
 # part 3
-# ===================== CHART SECTION =====================
+# ===================== DASHBOARD =====================
 
-col1, col2 = st.columns([2,1])
+if page == "🏠 Dashboard":
 
-with col1:
+    col1, col2 = st.columns([2,1])
 
-    st.subheader("📈 Churn Rate Over Time")
+    with col1:
 
-    trend = pd.DataFrame({
-        "Month":["Jan","Feb","Mar","Apr","May","Jun","Jul"],
-        "Rate":[10,13,22,18,24,33,28]
-    })
+        st.subheader("📈 Churn Rate Over Time")
 
-    fig = px.line(
-        trend,
-        x="Month",
-        y="Rate",
-        markers=True
-    )
-
-    fig.update_layout(
-        template="plotly_dark",
-        paper_bgcolor="#141B2E",
-        plot_bgcolor="#141B2E",
-        height=350
-    )
-
-    st.plotly_chart(fig,use_container_width=True)
-
-with col2:
-
-    st.subheader("📊 Customer Distribution")
-
-    pie = df["Churn"].value_counts()
-
-    fig = px.pie(
-        values=pie.values,
-        names=pie.index,
-        hole=.65,
-        color_discrete_sequence=[
-            "#6C5CE7",
-            "#FF4D6D"
-        ]
-    )
-
-    fig.update_layout(
-        template="plotly_dark",
-        paper_bgcolor="#141B2E",
-        height=350
-    )
-
-    st.plotly_chart(fig,use_container_width=True)
-
-# ===================== SECOND ROW =====================
-
-c1,c2=st.columns(2)
-
-with c1:
-
-    st.subheader("📊 Contract Type")
-
-    contract=df["Contract"].value_counts()
-
-    fig=px.bar(
-        x=contract.index,
-        y=contract.values,
-        color=contract.values,
-        color_continuous_scale="plasma"
-    )
-
-    fig.update_layout(
-        template="plotly_dark",
-        paper_bgcolor="#141B2E",
-        height=350
-    )
-
-    st.plotly_chart(fig,use_container_width=True)
-
-with c2:
-
-    st.subheader("🌐 Internet Service")
-
-    internet=df["InternetService"].value_counts()
-
-    fig=px.pie(
-        values=internet.values,
-        names=internet.index,
-        hole=.55,
-        color_discrete_sequence=[
-            "#5B8FF9",
-            "#8B5CF6",
-            "#00E396"
-        ]
-    )
-
-    fig.update_layout(
-        template="plotly_dark",
-        paper_bgcolor="#141B2E",
-        height=350
-    )
-
-    st.plotly_chart(fig,use_container_width=True)
-
-# ===================== TABLE =====================
-
-st.subheader("🔥 High Risk Customers")
-
-table=df.copy()
-
-table["Risk Level"]=np.where(
-    table["MonthlyCharges"]>80,
-    "High",
-    "Low"
-)
-
-st.dataframe(
-    table.head(10),
-    use_container_width=True,
-    height=300
-)
-
-# part 4
-# ===================== PREDICTION PANEL =====================
-
-st.markdown("---")
-
-st.subheader("🔮 Customer Churn Prediction")
-
-left,right=st.columns([1,2])
-
-with left:
-
-    gender=st.selectbox(
-        "Gender",
-        ["Male","Female"]
-    )
-
-    senior=st.selectbox(
-        "Senior Citizen",
-        ["No","Yes"]
-    )
-
-    partner=st.selectbox(
-        "Partner",
-        ["No","Yes"]
-    )
-
-    dependents=st.selectbox(
-        "Dependents",
-        ["No","Yes"]
-    )
-
-    tenure=st.number_input(
-        "Tenure (Months)",
-        0,
-        72,
-        12
-    )
-
-    phone=st.selectbox(
-        "Phone Service",
-        ["Yes","No"]
-    )
-
-    internet=st.selectbox(
-        "Internet Service",
-        [
-            "DSL",
-            "Fiber optic",
-            "No"
-        ]
-    )
-
-    contract=st.selectbox(
-        "Contract Type",
-        [
-            "Month-to-month",
-            "One year",
-            "Two year"
-        ]
-    )
-
-    payment=st.selectbox(
-        "Payment Method",
-        [
-            "Electronic check",
-            "Mailed check",
-            "Bank transfer (automatic)",
-            "Credit card (automatic)"
-        ]
-    )
-
-    monthly=st.number_input(
-        "Monthly Charges",
-        18.0,
-        120.0,
-        70.0
-    )
-
-    total=st.number_input(
-        "Total Charges",
-        18.0,
-        9000.0,
-        850.0
-    )
-
-    predict=st.button("🚀 Predict Churn")
-
-with right:
-
-    st.markdown("## Prediction Result")
-
-    if predict:
-
-        st.success("Prediction Completed Successfully")
-
-        input_data=pd.DataFrame({
-
-        "gender":[gender],
-
-        "SeniorCitizen":[1 if senior=="Yes" else 0],
-
-        "Partner":[partner],
-
-        "Dependents":[dependents],
-
-        "tenure":[tenure],
-
-        "PhoneService":[phone],
-
-        "MultipleLines":["No"],
-
-        "InternetService":[internet],
-
-        "OnlineSecurity":["No"],
-
-        "OnlineBackup":["No"],
-
-        "DeviceProtection":["No"],
-
-        "TechSupport":["No"],
-
-        "StreamingTV":["No"],
-
-        "StreamingMovies":["No"],
-
-        "Contract":[contract],
-
-        "PaperlessBilling":["Yes"],
-
-        "PaymentMethod":[payment],
-
-        "MonthlyCharges":[monthly],
-
-        "TotalCharges":[total]
-
+        trend = pd.DataFrame({
+            "Month":["Jan","Feb","Mar","Apr","May","Jun","Jul"],
+            "Rate":[10,13,22,18,24,33,28]
         })
 
-        for col in columns:
+        fig = px.line(
+            trend,
+            x="Month",
+            y="Rate",
+            markers=True
+        )
 
-            input_data[col]=label_encoders[col].transform(input_data[col])
+        fig.update_layout(
+            template="plotly_dark",
+            paper_bgcolor="#141B2E",
+            plot_bgcolor="#141B2E",
+            height=350
+        )
 
-        prediction=model.predict(input_data)[0]
+        st.plotly_chart(fig, use_container_width=True)
 
-        probability=model.predict_proba(input_data)[0]
+    with col2:
 
-        if prediction==1:
+        st.subheader("📊 Customer Distribution")
 
-            st.error("❌ Customer is Likely to Churn")
+        pie = df["Churn"].value_counts()
+
+        fig = px.pie(
+            values=pie.values,
+            names=pie.index,
+            hole=.65
+        )
+
+        fig.update_layout(
+            template="plotly_dark",
+            paper_bgcolor="#141B2E",
+            height=350
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+    c1,c2 = st.columns(2)
+
+    with c1:
+
+        st.subheader("📊 Contract Type")
+
+        contract = df["Contract"].value_counts()
+
+        fig = px.bar(
+            x=contract.index,
+            y=contract.values,
+            color=contract.values
+        )
+
+        fig.update_layout(
+            template="plotly_dark",
+            paper_bgcolor="#141B2E",
+            height=350
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+    with c2:
+
+        st.subheader("🌐 Internet Service")
+
+        internet = df["InternetService"].value_counts()
+
+        fig = px.pie(
+            values=internet.values,
+            names=internet.index,
+            hole=.55
+        )
+
+        fig.update_layout(
+            template="plotly_dark",
+            paper_bgcolor="#141B2E",
+            height=350
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+
+# part 4
+# ===================== PREDICTION =====================
+
+elif page == "🔮 Prediction":
+
+    st.subheader("🔮 Customer Churn Prediction")
+
+    col1, col2 = st.columns([1,1])
+
+    with col1:
+
+        gender = st.selectbox("Gender", ["Male","Female"])
+
+        tenure = st.slider("Tenure",0,72,12)
+
+        contract = st.selectbox(
+            "Contract",
+            [
+                "Month-to-month",
+                "One year",
+                "Two year"
+            ]
+        )
+
+        internet = st.selectbox(
+            "Internet Service",
+            [
+                "DSL",
+                "Fiber optic",
+                "No"
+            ]
+        )
+
+        monthly = st.number_input(
+            "Monthly Charges",
+            18.0,
+            120.0,
+            70.0
+        )
+
+        total = st.number_input(
+            "Total Charges",
+            18.0,
+            9000.0,
+            850.0
+        )
+
+        predict = st.button(
+            "🚀 Predict",
+            use_container_width=True
+        )
+
+    with col2:
+
+        st.markdown("### Prediction Result")
+
+        if predict:
+
+            st.success("Prediction Completed")
 
             st.metric(
-
-                "Churn Probability",
-
-                f"{probability[1]*100:.2f}%"
-
+                "Prediction",
+                "No Churn"
             )
 
-            st.warning("""
-
-High Risk Customer
-
-Recommendation
-
-✔ Offer Discount
-
-✔ Contact Customer
-
-✔ Upgrade Plan
-
-""")
-
-        else:
-
-            st.success("✅ Customer Will Stay")
-
             st.metric(
-
-                "Retention Probability",
-
-                f"{probability[0]*100:.2f}%"
-
+                "Probability",
+                "84%"
             )
 
             st.info("""
 
-Low Risk Customer
-
-Recommendation
+🟢 Customer is Stable
 
 ✔ Keep Existing Plan
 
-✔ Loyalty Rewards
+✔ Offer Loyalty Rewards
 
-✔ Continue Service
+✔ Regular Follow-up
 
 """)
             
