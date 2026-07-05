@@ -25,7 +25,7 @@ df = pd.read_csv("final_data.csv")
 
 # ===================== LOAD MODEL =====================
 
-with open("model.pkl", "rb") as file:
+with open("customer_churn_model.pkl", "rb") as file:
     model = pickle.load(file)
 
 # ===================== REMOVE CUSTOMER ID =====================
@@ -98,15 +98,6 @@ avg_total = round(
 # ===================== CUSTOM CSS =====================
 
 st.markdown("""
-            [data-testid="stSidebar"]{
-    background:#111827;
-    min-width:280px;
-    max-width:280px;
-}
-
-[data-testid="collapsedControl"]{
-    display:none;
-}
 <style>
 
 #MainMenu{
@@ -216,26 +207,46 @@ border:.5px solid #232B45;
 
 # ===================== SIDEBAR =====================
 
+st.sidebar.image(
+"https://img.icons8.com/color/96/artificial-intelligence.png",
+width=70
+)
 
-with st.sidebar:
+st.sidebar.title("Customer Churn")
 
-    st.title("📊 Churn AI")
+page = st.sidebar.radio(
 
-    st.markdown("---")
+"Navigation",
 
-    page = st.radio(
-        "Navigation",
-        [
-            "🏠 Dashboard",
-            "🔮 Prediction",
-            "📈 Analytics"
-        ]
-    )
+[
 
-    st.markdown("---")
+"🏠 Dashboard",
 
-    st.metric("👥 Customers", total_customers)
-    st.metric("📊 Churn Rate", f"{churn_rate}%")
+"🔮 Prediction",
+
+"📈 Analytics",
+
+"📋 Customers",
+
+"⚙ Settings"
+
+]
+
+)
+
+st.sidebar.markdown("---")
+
+st.sidebar.success("Model Loaded Successfully")
+
+st.sidebar.info(f"""
+
+Total Customers : {total_customers}
+
+Active Customers : {active_customers}
+
+Churn Customers : {churn_customers}
+
+""")
 
 # ===================== HEADER =====================
 
@@ -375,179 +386,321 @@ st.write("")
 st.write("")
 
 # part 3
-# ===================== DASHBOARD =====================
+# ===================== CHART SECTION =====================
 
-if page == "🏠 Dashboard":
+col1, col2 = st.columns([2,1])
 
-    col1, col2 = st.columns([2,1])
+with col1:
 
-    with col1:
+    st.subheader("📈 Churn Rate Over Time")
 
-        st.subheader("📈 Churn Rate Over Time")
+    trend = pd.DataFrame({
+        "Month":["Jan","Feb","Mar","Apr","May","Jun","Jul"],
+        "Rate":[10,13,22,18,24,33,28]
+    })
 
-        trend = pd.DataFrame({
-            "Month":["Jan","Feb","Mar","Apr","May","Jun","Jul"],
-            "Rate":[10,13,22,18,24,33,28]
-        })
+    fig = px.line(
+        trend,
+        x="Month",
+        y="Rate",
+        markers=True
+    )
 
-        fig = px.line(
-            trend,
-            x="Month",
-            y="Rate",
-            markers=True
-        )
+    fig.update_layout(
+        template="plotly_dark",
+        paper_bgcolor="#141B2E",
+        plot_bgcolor="#141B2E",
+        height=350
+    )
 
-        fig.update_layout(
-            template="plotly_dark",
-            paper_bgcolor="#141B2E",
-            plot_bgcolor="#141B2E",
-            height=350
-        )
+    st.plotly_chart(fig,use_container_width=True)
 
-        st.plotly_chart(fig, use_container_width=True)
+with col2:
 
-    with col2:
+    st.subheader("📊 Customer Distribution")
 
-        st.subheader("📊 Customer Distribution")
+    pie = df["Churn"].value_counts()
 
-        pie = df["Churn"].value_counts()
+    fig = px.pie(
+        values=pie.values,
+        names=pie.index,
+        hole=.65,
+        color_discrete_sequence=[
+            "#6C5CE7",
+            "#FF4D6D"
+        ]
+    )
 
-        fig = px.pie(
-            values=pie.values,
-            names=pie.index,
-            hole=.65
-        )
+    fig.update_layout(
+        template="plotly_dark",
+        paper_bgcolor="#141B2E",
+        height=350
+    )
 
-        fig.update_layout(
-            template="plotly_dark",
-            paper_bgcolor="#141B2E",
-            height=350
-        )
+    st.plotly_chart(fig,use_container_width=True)
 
-        st.plotly_chart(fig, use_container_width=True)
+# ===================== SECOND ROW =====================
 
-    c1,c2 = st.columns(2)
+c1,c2=st.columns(2)
 
-    with c1:
+with c1:
 
-        st.subheader("📊 Contract Type")
+    st.subheader("📊 Contract Type")
 
-        contract = df["Contract"].value_counts()
+    contract=df["Contract"].value_counts()
 
-        fig = px.bar(
-            x=contract.index,
-            y=contract.values,
-            color=contract.values
-        )
+    fig=px.bar(
+        x=contract.index,
+        y=contract.values,
+        color=contract.values,
+        color_continuous_scale="plasma"
+    )
 
-        fig.update_layout(
-            template="plotly_dark",
-            paper_bgcolor="#141B2E",
-            height=350
-        )
+    fig.update_layout(
+        template="plotly_dark",
+        paper_bgcolor="#141B2E",
+        height=350
+    )
 
-        st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig,use_container_width=True)
 
-    with c2:
+with c2:
 
-        st.subheader("🌐 Internet Service")
+    st.subheader("🌐 Internet Service")
 
-        internet = df["InternetService"].value_counts()
+    internet=df["InternetService"].value_counts()
 
-        fig = px.pie(
-            values=internet.values,
-            names=internet.index,
-            hole=.55
-        )
+    fig=px.pie(
+        values=internet.values,
+        names=internet.index,
+        hole=.55,
+        color_discrete_sequence=[
+            "#5B8FF9",
+            "#8B5CF6",
+            "#00E396"
+        ]
+    )
 
-        fig.update_layout(
-            template="plotly_dark",
-            paper_bgcolor="#141B2E",
-            height=350
-        )
+    fig.update_layout(
+        template="plotly_dark",
+        paper_bgcolor="#141B2E",
+        height=350
+    )
 
-        st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig,use_container_width=True)
 
+# ===================== TABLE =====================
+
+st.subheader("🔥 High Risk Customers")
+
+table=df.copy()
+
+table["Risk Level"]=np.where(
+    table["MonthlyCharges"]>80,
+    "High",
+    "Low"
+)
+
+st.dataframe(
+    table.head(10),
+    use_container_width=True,
+    height=300
+)
 
 # part 4
-# ===================== PREDICTION =====================
+# ===================== PREDICTION PANEL =====================
 
-elif page == "🔮 Prediction":
+st.markdown("---")
 
-    st.subheader("🔮 Customer Churn Prediction")
+st.subheader("🔮 Customer Churn Prediction")
 
-    col1, col2 = st.columns([1,1])
+left,right=st.columns([1,2])
 
-    with col1:
+with left:
 
-        gender = st.selectbox("Gender", ["Male","Female"])
+    gender=st.selectbox(
+        "Gender",
+        ["Male","Female"]
+    )
 
-        tenure = st.slider("Tenure",0,72,12)
+    senior=st.selectbox(
+        "Senior Citizen",
+        ["No","Yes"]
+    )
 
-        contract = st.selectbox(
-            "Contract",
-            [
-                "Month-to-month",
-                "One year",
-                "Two year"
-            ]
-        )
+    partner=st.selectbox(
+        "Partner",
+        ["No","Yes"]
+    )
 
-        internet = st.selectbox(
-            "Internet Service",
-            [
-                "DSL",
-                "Fiber optic",
-                "No"
-            ]
-        )
+    dependents=st.selectbox(
+        "Dependents",
+        ["No","Yes"]
+    )
 
-        monthly = st.number_input(
-            "Monthly Charges",
-            18.0,
-            120.0,
-            70.0
-        )
+    tenure=st.number_input(
+        "Tenure (Months)",
+        0,
+        72,
+        12
+    )
 
-        total = st.number_input(
-            "Total Charges",
-            18.0,
-            9000.0,
-            850.0
-        )
+    phone=st.selectbox(
+        "Phone Service",
+        ["Yes","No"]
+    )
 
-        predict = st.button(
-            "🚀 Predict",
-            use_container_width=True
-        )
+    internet=st.selectbox(
+        "Internet Service",
+        [
+            "DSL",
+            "Fiber optic",
+            "No"
+        ]
+    )
 
-    with col2:
+    contract=st.selectbox(
+        "Contract Type",
+        [
+            "Month-to-month",
+            "One year",
+            "Two year"
+        ]
+    )
 
-        st.markdown("### Prediction Result")
+    payment=st.selectbox(
+        "Payment Method",
+        [
+            "Electronic check",
+            "Mailed check",
+            "Bank transfer (automatic)",
+            "Credit card (automatic)"
+        ]
+    )
 
-        if predict:
+    monthly=st.number_input(
+        "Monthly Charges",
+        18.0,
+        120.0,
+        70.0
+    )
 
-            st.success("Prediction Completed")
+    total=st.number_input(
+        "Total Charges",
+        18.0,
+        9000.0,
+        850.0
+    )
+
+    predict=st.button("🚀 Predict Churn")
+
+with right:
+
+    st.markdown("## Prediction Result")
+
+    if predict:
+
+        st.success("Prediction Completed Successfully")
+
+        input_data=pd.DataFrame({
+
+        "gender":[gender],
+
+        "SeniorCitizen":[1 if senior=="Yes" else 0],
+
+        "Partner":[partner],
+
+        "Dependents":[dependents],
+
+        "tenure":[tenure],
+
+        "PhoneService":[phone],
+
+        "MultipleLines":["No"],
+
+        "InternetService":[internet],
+
+        "OnlineSecurity":["No"],
+
+        "OnlineBackup":["No"],
+
+        "DeviceProtection":["No"],
+
+        "TechSupport":["No"],
+
+        "StreamingTV":["No"],
+
+        "StreamingMovies":["No"],
+
+        "Contract":[contract],
+
+        "PaperlessBilling":["Yes"],
+
+        "PaymentMethod":[payment],
+
+        "MonthlyCharges":[monthly],
+
+        "TotalCharges":[total]
+
+        })
+
+        for col in columns:
+
+            input_data[col]=label_encoders[col].transform(input_data[col])
+
+        prediction=model.predict(input_data)[0]
+
+        probability=model.predict_proba(input_data)[0]
+
+        if prediction==1:
+
+            st.error("❌ Customer is Likely to Churn")
 
             st.metric(
-                "Prediction",
-                "No Churn"
+
+                "Churn Probability",
+
+                f"{probability[1]*100:.2f}%"
+
             )
 
+            st.warning("""
+
+High Risk Customer
+
+Recommendation
+
+✔ Offer Discount
+
+✔ Contact Customer
+
+✔ Upgrade Plan
+
+""")
+
+        else:
+
+            st.success("✅ Customer Will Stay")
+
             st.metric(
-                "Probability",
-                "84%"
+
+                "Retention Probability",
+
+                f"{probability[0]*100:.2f}%"
+
             )
 
             st.info("""
 
-🟢 Customer is Stable
+Low Risk Customer
+
+Recommendation
 
 ✔ Keep Existing Plan
 
-✔ Offer Loyalty Rewards
+✔ Loyalty Rewards
 
-✔ Regular Follow-up
+✔ Continue Service
 
 """)
             
@@ -839,7 +992,7 @@ st.download_button(
 
 # ========================= SUCCESS =========================
 
-# st.balloons()
+
 
 st.success("Dashboard Loaded Successfully")
 
