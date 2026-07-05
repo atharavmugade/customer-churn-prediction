@@ -95,102 +95,164 @@ avg_total = round(
 )
 
 # part 2
-# ========================= CSS =========================
+# ===================== CUSTOM CSS =====================
 
 st.markdown("""
 <style>
 
-#MainMenu{visibility:hidden;}
-footer{visibility:hidden;}
-header{visibility:hidden;}
+#MainMenu{
+visibility:hidden;
+}
+
+footer{
+visibility:hidden;
+}
+
+header{
+visibility:hidden;
+}
 
 [data-testid="stAppViewContainer"]{
-background:#0F172A;
+background:#0B1020;
 }
 
 [data-testid="stSidebar"]{
 background:#111827;
+border-right:1px solid #232b45;
+}
+
+section[data-testid="stSidebar"] *{
+color:white !important;
 }
 
 .block-container{
-padding-top:1rem;
-padding-left:2rem;
-padding-right:2rem;
-}
-
-.card{
-background:#1E293B;
-padding:14px;
-border-radius:14px;
-border:1px solid #334155;
-margin-bottom:10px;
-}
-
-.metric{
-font-size:28px;
-font-weight:bold;
-color:white;
+padding-top:20px;
+padding-left:35px;
+padding-right:35px;
 }
 
 .title{
-font-size:36px;
-font-weight:bold;
+font-size:40px;
+font-weight:700;
 color:white;
 }
 
 .sub{
-color:#94A3B8;
+font-size:15px;
+color:#9CA3AF;
+margin-bottom:25px;
+}
+
+.card{
+
+background:#161B2E;
+
+padding:20px;
+
+border-radius:18px;
+
+border:1px solid #222A45;
+
+box-shadow:0px 0px 18px rgba(0,255,255,.06);
+
+transition:.3s;
+
+}
+
+.card:hover{
+
+transform:translateY(-5px);
+
+box-shadow:0px 0px 30px cyan;
+
+}
+
+.metric-title{
+
+color:#9CA3AF;
+
+font-size:15px;
+
+}
+
+.metric-value{
+
+color:white;
+
+font-size:34px;
+
+font-weight:bold;
+
+}
+
+.metric-change{
+
+color:#4ADE80;
+
 font-size:14px;
+
+margin-top:8px;
+
+}
+
+hr{
+
+border:.5px solid #232B45;
+
 }
 
 </style>
+
 """,unsafe_allow_html=True)
 
-# ========================= SIDEBAR =========================
+# ===================== SIDEBAR =====================
 
-with st.sidebar:
+st.sidebar.image(
+"https://img.icons8.com/color/96/artificial-intelligence.png",
+width=70
+)
 
-    st.title("📊 Churn AI")
+st.sidebar.title("Customer Churn")
 
-    page=st.radio(
+page = st.sidebar.radio(
 
-    "Navigation",
+"Navigation",
 
-    [
+[
 
-    "Dashboard",
+"🏠 Dashboard",
 
-    "Prediction",
+"🔮 Prediction",
 
-    "Analytics"
+"📈 Analytics",
 
-    ]
+"📋 Customers",
 
-    )
+"⚙ Settings"
 
-    st.markdown("---")
+]
 
-    st.metric(
+)
 
-    "Customers",
+st.sidebar.markdown("---")
 
-    total_customers
+st.sidebar.success("Model Loaded Successfully")
 
-    )
+st.sidebar.info(f"""
 
-    st.metric(
+Total Customers : {total_customers}
 
-    "Churn Rate",
+Active Customers : {active_customers}
 
-    f"{churn_rate}%"
+Churn Customers : {churn_customers}
 
-    )
+""")
 
-# ========================= HEADER =========================
+# ===================== HEADER =====================
 
 st.markdown(
 
-'<p class="title">Customer Churn Dashboard</p>',
+'<div class="title">Customer Churn Dashboard</div>',
 
 unsafe_allow_html=True
 
@@ -198,88 +260,129 @@ unsafe_allow_html=True
 
 st.markdown(
 
-'<p class="sub">AI Powered Customer Retention Analytics</p>',
+'<div class="sub">AI Powered Customer Retention Analytics</div>',
 
 unsafe_allow_html=True
 
 )
 
-# ========================= KPI =========================
+# ===================== KPI CARDS =====================
 
-a,b,c,d=st.columns(4)
+c1,c2,c3,c4=st.columns(4)
 
-with a:
+with c1:
 
     st.markdown(f"""
 
 <div class="card">
 
-Total Customers
+<div class="metric-title">
 
-<p class="metric">
+👥 Total Customers
+
+</div>
+
+<div class="metric-value">
 
 {total_customers}
 
-</p>
+</div>
+
+<div class="metric-change">
+
+▲ 3.2%
+
+</div>
 
 </div>
 
 """,unsafe_allow_html=True)
 
-with b:
+with c2:
 
     st.markdown(f"""
 
 <div class="card">
 
-Active
+<div class="metric-title">
 
-<p class="metric">
-
-{active_customers}
-
-</p>
+❌ Churn Customers
 
 </div>
 
-""",unsafe_allow_html=True)
-
-with c:
-
-    st.markdown(f"""
-
-<div class="card">
-
-Churn
-
-<p class="metric">
+<div class="metric-value">
 
 {churn_customers}
 
-</p>
+</div>
+
+<div class="metric-change">
+
+▼ 1.4%
+
+</div>
 
 </div>
 
 """,unsafe_allow_html=True)
 
-with d:
+with c3:
 
     st.markdown(f"""
 
 <div class="card">
 
-Rate
+<div class="metric-title">
 
-<p class="metric">
+✅ Active Customers
 
-{churn_rate}%
+</div>
 
-</p>
+<div class="metric-value">
+
+{active_customers}
+
+</div>
+
+<div class="metric-change">
+
+▲ 5.1%
+
+</div>
 
 </div>
 
 """,unsafe_allow_html=True)
 
+with c4:
+
+    st.markdown(f"""
+
+<div class="card">
+
+<div class="metric-title">
+
+📊 Churn Rate
+
+</div>
+
+<div class="metric-value">
+
+{churn_rate} %
+
+</div>
+
+<div class="metric-change">
+
+▲ Updated
+
+</div>
+
+</div>
+
+""",unsafe_allow_html=True)
+
+st.write("")
 st.write("")
 
 # part3
