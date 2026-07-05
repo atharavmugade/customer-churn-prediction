@@ -998,3 +998,4 @@ st.success("Dashboard Loaded Successfully")
 
 st.caption("Customer Churn Prediction Dashboard • Streamlit • Machine Learning")
 st.caption("Made with ❤️ by Atharav_Mugade")
+st.caption("© 2026 Diabetes Prediction System | Developed by Atharav_mugade")
