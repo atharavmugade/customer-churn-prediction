@@ -385,185 +385,127 @@ with c4:
 st.write("")
 st.write("")
 
-# part3
-# ========================= ROW 1 =========================
+# part 3
+# ===================== CHART SECTION =====================
 
-left,right=st.columns([1,2])
+col1, col2 = st.columns([2,1])
 
-# ========================= PREDICTION =========================
+with col1:
 
-with left:
+    st.subheader("📈 Churn Rate Over Time")
 
-    st.markdown("### 🔮 Customer Prediction")
+    trend = pd.DataFrame({
+        "Month":["Jan","Feb","Mar","Apr","May","Jun","Jul"],
+        "Rate":[10,13,22,18,24,33,28]
+    })
 
-    gender=st.selectbox(
-        "Gender",
-        ["Male","Female"]
+    fig = px.line(
+        trend,
+        x="Month",
+        y="Rate",
+        markers=True
     )
 
-    tenure=st.slider(
-        "Tenure",
-        0,
-        72,
-        12
+    fig.update_layout(
+        template="plotly_dark",
+        paper_bgcolor="#141B2E",
+        plot_bgcolor="#141B2E",
+        height=350
     )
 
-    contract=st.selectbox(
-        "Contract",
-        [
-            "Month-to-month",
-            "One year",
-            "Two year"
+    st.plotly_chart(fig,use_container_width=True)
+
+with col2:
+
+    st.subheader("📊 Customer Distribution")
+
+    pie = df["Churn"].value_counts()
+
+    fig = px.pie(
+        values=pie.values,
+        names=pie.index,
+        hole=.65,
+        color_discrete_sequence=[
+            "#6C5CE7",
+            "#FF4D6D"
         ]
     )
 
-    internet=st.selectbox(
-        "Internet Service",
-        [
-            "DSL",
-            "Fiber optic",
-            "No"
+    fig.update_layout(
+        template="plotly_dark",
+        paper_bgcolor="#141B2E",
+        height=350
+    )
+
+    st.plotly_chart(fig,use_container_width=True)
+
+# ===================== SECOND ROW =====================
+
+c1,c2=st.columns(2)
+
+with c1:
+
+    st.subheader("📊 Contract Type")
+
+    contract=df["Contract"].value_counts()
+
+    fig=px.bar(
+        x=contract.index,
+        y=contract.values,
+        color=contract.values,
+        color_continuous_scale="plasma"
+    )
+
+    fig.update_layout(
+        template="plotly_dark",
+        paper_bgcolor="#141B2E",
+        height=350
+    )
+
+    st.plotly_chart(fig,use_container_width=True)
+
+with c2:
+
+    st.subheader("🌐 Internet Service")
+
+    internet=df["InternetService"].value_counts()
+
+    fig=px.pie(
+        values=internet.values,
+        names=internet.index,
+        hole=.55,
+        color_discrete_sequence=[
+            "#5B8FF9",
+            "#8B5CF6",
+            "#00E396"
         ]
     )
 
-    monthly=st.number_input(
-        "Monthly Charges",
-        18.0,
-        120.0,
-        70.0
+    fig.update_layout(
+        template="plotly_dark",
+        paper_bgcolor="#141B2E",
+        height=350
     )
 
-    total=st.number_input(
-        "Total Charges",
-        18.0,
-        9000.0,
-        850.0
-    )
+    st.plotly_chart(fig,use_container_width=True)
 
-    predict=st.button(
-        "🚀 Predict",
-        use_container_width=True
-    )
+# ===================== TABLE =====================
 
-# ========================= CHARTS =========================
+st.subheader("🔥 High Risk Customers")
 
-with right:
+table=df.copy()
 
-    c1,c2=st.columns(2)
+table["Risk Level"]=np.where(
+    table["MonthlyCharges"]>80,
+    "High",
+    "Low"
+)
 
-    with c1:
-
-        st.markdown("#### 📈 Churn Trend")
-
-        trend=pd.DataFrame({
-
-            "Month":[
-
-            "Jan","Feb","Mar",
-
-            "Apr","May","Jun"
-
-            ],
-
-            "Rate":[
-
-            14,18,22,25,27,30
-
-            ]
-
-        })
-
-        fig=px.line(
-
-            trend,
-
-            x="Month",
-
-            y="Rate",
-
-            markers=True
-
-        )
-
-        fig.update_layout(
-
-            template="plotly_dark",
-
-            paper_bgcolor="#1E293B",
-
-            plot_bgcolor="#1E293B",
-
-            margin=dict(
-
-                l=10,
-
-                r=10,
-
-                t=30,
-
-                b=10
-
-            ),
-
-            height=270
-
-        )
-
-        st.plotly_chart(
-
-            fig,
-
-            use_container_width=True
-
-        )
-
-    with c2:
-
-        st.markdown("#### 🥧 Customer Distribution")
-
-        pie=df["Churn"].value_counts()
-
-        fig=px.pie(
-
-            values=pie.values,
-
-            names=pie.index,
-
-            hole=.65
-
-        )
-
-        fig.update_layout(
-
-            template="plotly_dark",
-
-            paper_bgcolor="#1E293B",
-
-            margin=dict(
-
-                l=10,
-
-                r=10,
-
-                t=30,
-
-                b=10
-
-            ),
-
-            height=270
-
-        )
-
-        st.plotly_chart(
-
-            fig,
-
-            use_container_width=True
-
-        )
-
-st.write("")
+st.dataframe(
+    table.head(10),
+    use_container_width=True,
+    height=300
+)
 
 # part 4
 # ===================== PREDICTION PANEL =====================
@@ -761,6 +703,8 @@ Recommendation
 ✔ Continue Service
 
 """)
+            
+
 # part 5
 # ========================= RISK FACTORS =========================
 
